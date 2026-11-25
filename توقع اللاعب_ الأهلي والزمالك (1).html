@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>توقع اللاعب: الأهلي والزمالك</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f4ef;--card:#ffffff;--ink:#1b1b1f;--mute:#6b6b73;--red:#c8102e;--white:#ffffff;--line:#e2dfd7;--ok:#14803c;--bad:#c8102e;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#15151a;--card:#202027;--ink:#f1f1f4;--mute:#a0a0aa;--line:#33333c;--ok:#4cd07d;--bad:#ff6b80;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#15151a;--card:#202027;--ink:#f1f1f4;--mute:#a0a0aa;--line:#33333c;--ok:#4cd07d;--bad:#ff6b80;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Cairo',Tahoma,Arial,sans-serif;min-height:100vh}
+.wrap{max-width:520px;margin:0 auto;padding:16px}
+.top{display:flex;height:10px;border-radius:6px;overflow:hidden;margin-bottom:14px}
+.top i{flex:1;background:var(--red)}.top b{flex:1;background:var(--white);border:1px solid var(--line)}
+h1{font-size:26px;font-weight:900;margin:0 0 4px}
+.sub{color:var(--mute);margin:0 0 16px;font-size:15px}
+.bar{display:flex;justify-content:space-between;font-weight:700;margin-bottom:10px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.hint{padding:11px 12px;border-radius:10px;border:1px solid var(--line);margin-bottom:8px;font-size:17px}
+.hint.new{border-color:var(--red)}
+.hint span{color:var(--red);font-weight:900;margin-left:6px}
+.row{display:flex;gap:8px;margin-top:12px}
+input{flex:1;min-width:0;font:inherit;font-size:18px;padding:12px;border-radius:10px;border:2px solid var(--line);background:var(--bg);color:var(--ink)}
+input:focus{outline:none;border-color:var(--red)}
+button{font:inherit;font-weight:700;font-size:16px;padding:12px 16px;border-radius:10px;border:0;cursor:pointer;background:var(--red);color:#fff}
+button.alt{background:transparent;color:var(--ink);border:2px solid var(--line)}
+button:focus-visible{outline:3px solid var(--ink);outline-offset:2px}
+button:disabled{opacity:.45;cursor:default}
+.tools{display:flex;gap:8px;margin-top:10px}.tools button{flex:1}
+.msg{min-height:34px;margin-top:12px;font-size:20px;font-weight:900;text-align:center}
+.msg.ok{color:var(--ok)}.msg.bad{color:var(--bad)}.msg.info{color:var(--mute);font-size:17px}
+.end{text-align:center}.end .big{font-size:56px;font-weight:900;color:var(--red);margin:6px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><i></i><b></b></div>
+  <h1>توقع اللاعب</h1>
+  <p class="sub">لاعبو الأهلي من 2019 والزمالك من 2020 لحد 2026</p>
+  <div id="app"></div>
+</div>
+<script>
+// [الاسم, أسماء بديلة, النادي, 4 تلميحات]
+var P=[
+["علي معلول",["معلول"],"الأهلي",["بيلعب ظهير أيسر","جنسيته تونسية","لاعب في الأهلي","مشهور بالضربات الحرة القوية والجزاءات"]],
+["بيرسي تاو",["تاو","بيرسي"],"الأهلي",["مهاجم أو جناح سريع","جنوب أفريقي","اتعاقد معاه الأهلي سنة 2021","لعب قبل كده في إنجلترا مع برايتون"]],
+["محمد الشناوي",["الشناوي"],"الأهلي",["حارس مرمى","مصري وبيحرس عرين منتخب مصر","حارس الأهلي","اسمه الأول محمد وآخره بيبدأ بحرف الشين"]],
+["تريزيجيه",["تريزيجيه","تريزيجية","تريزيجيت","تريزي","تريزيغيه","تريزيجيت"],"الأهلي",["جناح ماهر","مصري","لعب في أستون فيلا","انضم للأهلي سنة 2022"]],
+["عمرو السولية",["السولية","سولية"],"الأهلي",["لاعب وسط","مصري","بيلعب في الأهلي","بيتميز بالجري وقطع الكور في منتصف الملعب"]],
+["محمد هاني",["هاني"],"الأهلي",["ظهير أيمن","مصري","من لاعبي الأهلي","اسمه الأول محمد وآخره هاني"]],
+["زيزو",["زيزو","احمد سيد زيزو","احمد سيد"],"الزمالك",["جناح ومهاجم","مصري","لاعب في الزمالك","لقبه من أربع حروف"]],
+["فرجاني ساسي",["فرجاني","ساسي"],"الزمالك",["لاعب وسط","تونسي","لاعب في الزمالك","بيسدد من بعيد واسمه بيبدأ بحرف الفاء"]],
+["شيكابالا",["شيكابالا","شيكا","محمود عبد الرازق"],"الزمالك",["جناح مهاري","مصري","أسطورة الزمالك","اسمه الحقيقي محمود عبد الرازق"]],
+["سيف الدين الجزيري",["الجزيري","سيف الجزيري","جزيري"],"الزمالك",["مهاجم","تونسي","لاعب في الزمالك","اسمه بيبدأ بكلمة سيف"]],
+["أحمد فتوح",["فتوح"],"الزمالك",["ظهير أيسر","مصري","لاعب في الزمالك","بيتميز بالانطلاقات على الجناح"]],
+["جنش",["جنش","ابو جبل","محمد ابو جبل"],"الزمالك",["حارس مرمى","مصري","حارس الزمالك","لقبه بيبدأ بحرف الجيم"]]
+];
+var ROUNDS=10;
+function norm(s){return String(s).toLowerCase().replace(/[\u064B-\u065F\u0640]/g,"").replace(/[أإآ]/g,"ا").replace(/ة/g,"ه").replace(/ى/g,"ي").replace(/[^\u0621-\u064Aa-z0-9]/g,"");}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+var app=document.getElementById("app"),queue,idx,score,hints,locked;
+function start(){queue=shuffle(P).slice(0,ROUNDS);idx=0;score=0;round()}
+function round(){hints=1;locked=false;draw("")}
+function draw(msg,cls){
+  var p=queue[idx],h="";
+  for(var i=0;i<hints;i++)h+='<div class="hint'+(i===hints-1?' new':'')+'"><span>تلميح '+(i+1)+':</span>'+p[3][i]+'</div>';
+  app.innerHTML='<div class="bar"><span>السؤال '+(idx+1)+' من '+ROUNDS+'</span><span>النقاط: '+score+' / '+ROUNDS+'</span></div>'+
+  '<div class="card">'+h+
+  '<div class="row"><input id="g" type="text" placeholder="اكتب اسم اللاعب" autocomplete="off" '+(locked?'disabled':'')+'><button id="go" '+(locked?'disabled':'')+'>تأكيد</button></div>'+
+  '<div class="tools"><button class="alt" id="hn" '+(locked||hints>=4?'disabled':'')+'>تلميح تاني</button><button class="alt" id="sk">'+(locked?'التالي':'تخطي')+'</button></div>'+
+  '<div class="msg '+(cls||'')+'" id="m">'+msg+'</div></div>';
+  var g=document.getElementById("g");
+  if(!locked){g.focus();document.getElementById("go").onclick=check;g.onkeydown=function(e){if(e.key==="Enter")check()};}
+  document.getElementById("hn").onclick=function(){if(hints<4){hints++;draw("")}};
+  document.getElementById("sk").onclick=function(){
+    if(locked){next()}else{locked=true;draw("الإجابة: "+p[0]+" ("+p[2]+")","info")}
+  };
+}
+function check(){
+  var v=norm(document.getElementById("g").value);if(!v)return;
+  var p=queue[idx],ok=[p[0]].concat(p[1]).some(function(a){return norm(a)===v});
+  if(ok){score++;locked=true;draw("عاش يا اسطورة 🔥 ("+p[0]+")","ok")}
+  else{draw("ركز يا بطل","bad")}
+}
+function next(){idx++;if(idx>=ROUNDS)finish();else round()}
+function finish(){
+  var t=score>=9?"أسطورة بجد!":score>=6?"كويس جدًا يا بطل":score>=3?"محتاج تركيز أكتر":"ركز يا بطل وحاول تاني";
+  app.innerHTML='<div class="card end"><div>نتيجتك</div><div class="big">'+score+' / '+ROUNDS+'</div><div class="msg">'+t+'</div><div class="tools"><button id="again">العب تاني</button></div></div>';
+  document.getElementById("again").onclick=start;
+}
+start();
+</script>
+</body>
+</html>
